@@ -36,6 +36,7 @@ win_size = 5
 # 16 inches = 0.4064m
 c_dist = 0.4064
 
+# error in uwb distance = +09 cm
 offset = 0.09
 
 while True:
