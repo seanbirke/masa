@@ -9,7 +9,7 @@ dwm1 = serial.Serial(port='/dev/ttyACM1', baudrate=115200)
 print('Connected to ' + dwm0.name + ' and ' + dwm1.name)
 
 # Arduino is defined on ttyACM2 so must be plugged in third
-Arduino = serial.Serial(port='/dev/ttyACM2', baudrate=9600)
+Arduino = serial.Serial(port='/dev/ttyACM2', baudrate=9600, timeout=0.2)
 
 # init uwb modules, start outputign distances
 dwm0.write('\r\r'.encode())
@@ -45,10 +45,8 @@ while True:
         line1 = dwm1.readline()
         # Extract distance from line, case on <10m or >10m (line len 37 or 38)
         if len(line0) == 37 or len(line0) == 38:
-            #dist0s = str(line0[-6:-5] + line0[-4:-2]) + '\n'
             dist0f = float(line0[-6:-2])
             if len(line0) == 38:
-                #dist0s = str(line0[-7:-5] + line0[-4:-2]) + '\n'
                 dist0f = float(line0[-7:2])
             if len(window0) < win_size:
                 window0.append(dist0f)
@@ -56,10 +54,8 @@ while True:
                 window0.pop(0)
                 window0.append(dist0f)
         if len(line1) == 37 or len(line1) == 38:
-            #dist1s = str(line1[-6:-5] + line1[-4:-2]) + '\n'
             dist1f = float(line1[-6:-2])
             if len(line1) == 38:
-                #dist1s = str(line1[-7:-5] + line1[-4:-2]) + '\n'
                 dist1f = float(line1[-7:2])
             if len(window1) < win_size:
                 window1.append(dist1f)
@@ -90,11 +86,17 @@ while True:
             Arduino.write(dist0s.encode('utf-8'))
             Arduino.write(dist1s.encode('utf-8'))
             Arduino.write(angle.encode('utf-8'))
-
-            rec_msg = Arduino.readline().decode('utf-8', 'backslashreplace')
-            print('FROM ARDUINO: ', end='')
-            print(rec_msg)
-
+           
+            '''''
+            try:
+                print("start rec")
+                rec_msg = Arduino.readline().decode('utf-8', 'backslashreplace')
+                print('FROM ARDUINO: ', end='')
+                print(rec_msg)
+            except:
+                print("NO REC MSG")
+                break
+            '''''
     except:
         print("Unspecified Error")
         break
@@ -103,3 +105,4 @@ dwm0.write('\r'.encode())
 dwm1.write('\r'.encode())
 dwm0.close()
 dwm1.close()
+Arduino.close()
