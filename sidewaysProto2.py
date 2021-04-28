@@ -35,11 +35,11 @@ win_size = 5
 # holds previous angles
 angles = []
 # angle window size, first 5 old, next 5 new
-num_angles = 30
+num_angles = 10
 
 # distance between uwb on the suitcase [m]
-# 16 inches = 0.4064m
-c_dist = 0.4064
+# 9 inches = 0.2286m
+c_dist = 0.2286
 
 # error in uwb distance = +09 cm
 offset = 0.09
@@ -76,12 +76,15 @@ while True:
             dist0a = getAvg(window0) + offset
             dist1a = getAvg(window1) + offset
 
-            loc = (c_dist**2 + dist0a**2 - dist1a**2)/(2*dist0a*c_dist)
+            big = max(dist0a, dist1a)
+            sm = min(dist0a, dist1a)
+
+            loc = (c_dist**2 + big**2 - sm**2)/(2*big*c_dist)
             if loc < -1:
                 loc = -1
             elif loc > 1:
                 loc = 1
-            angle = 180 - math.degrees(math.acos(loc))
+            angle = 90 - math.degrees(math.acos(loc))
 
             if dist0a > 1 and dist1a > 1:
                 if len(angles) >= num_angles:
@@ -97,12 +100,11 @@ while True:
             print("old_ang: ", old_ang)
             print("new_ang: ", new_ang)
 
-            if new_ang - old_ang > 10:
-                isLeft = not isLeft
-        
-            if isLeft:
+            if abs(dist0a - dist1a) < 0.15:
+                lr_bool = 2
+            elif dist0a < dist1a:
                 lr_bool = 0
-            else:
+            elif dist1a < dist0a:
                 lr_bool = 1
 
 
