@@ -114,8 +114,7 @@ void loop() {
     if (frontIRdistance1 < 50 || frontIRdistance2 < 50){
       // Implement case for local minima - getting stuck in a U-Shaped obstacle
       if ((frontIRdistance1 < 30 && frontIRdistance2 < 30) || (frontIRdistance1 < 15) || (frontIRdistance2 < 15)){
-        moveForward(0);
-        moveBackward(64);      
+        moveBackward(32);      
       }
       else if (frontIRdistance1 < frontIRdistance2){
         roboclaw.BackwardM1(address, 32);

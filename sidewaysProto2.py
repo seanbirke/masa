@@ -46,6 +46,9 @@ offset = 0.09
 
 isLeft = True
 
+# difference threshold in uwb distance for command = straight (lr_bool = 2)
+straightDistLimit = 0.15
+
 while True:
     try:
         # Read line from uwb
@@ -100,12 +103,14 @@ while True:
             print("old_ang: ", old_ang)
             print("new_ang: ", new_ang)
 
-            if abs(dist0a - dist1a) < 0.15:
+            if abs(dist0a - dist1a) <= straightDistLimit:
                 lr_bool = 2
             elif dist0a < dist1a:
                 lr_bool = 0
             elif dist1a < dist0a:
                 lr_bool = 1
+            else:
+                lr_bool = 2
 
 
             dist0s = str(int(dist0a*100)) + '\n'
