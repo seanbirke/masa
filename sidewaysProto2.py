@@ -103,14 +103,12 @@ while True:
             print("old_ang: ", old_ang)
             print("new_ang: ", new_ang)
 
-            if abs(dist0a - dist1a) <= straightDistLimit:
+            if abs(dist0a - dist1a) < 0.15:
                 lr_bool = 2
             elif dist0a < dist1a:
                 lr_bool = 0
             elif dist1a < dist0a:
                 lr_bool = 1
-            else:
-                lr_bool = 2
 
 
             dist0s = str(int(dist0a*100)) + '\n'
