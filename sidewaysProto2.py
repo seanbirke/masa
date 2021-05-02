@@ -1,3 +1,5 @@
+#!/usr/bin/env/python3
+
 import serial
 import time
 import math
@@ -12,9 +14,10 @@ print('Connected to ' + dwm0.name + ' and ' + dwm1.name)
 Arduino = serial.Serial(port='/dev/ttyACM2', baudrate=9600, timeout=1)
 
 # init uwb modules, start outputign distances
-dwm0.write('\r\r'.encode())
-dwm1.write('\r\r'.encode())
-time.sleep(1)
+dwm0.write('\r'.encode())
+#time.sleep(1)
+dwm1.write('\r'.encode())
+#time.sleep(1)
 dwm0.write('lec\r'.encode())
 dwm1.write('lec\r'.encode())
 time.sleep(1)
@@ -46,11 +49,41 @@ offset = 0.09
 
 isLeft = True
 
+# threshold in uwb distance differences, to determine straight bool
+straight_thresh = 0.12
+
+#time.sleep(10)
+
+#lecFound0 = False
+#lecFound1 = False
+
 while True:
+    #t = time.time()
     try:
         # Read line from uwb
+        #try:            
+         #   line0 = dwm0.readline()
+          #  line1 = dwm1.readline()
+        #except:
+         #   line0 = 'b'
+          #  line1 = 'b'
+        
+        #while not lecFound0 and not lecFound1:
+            #line0 = dwm0.readline()
+            #line1 = dwm1.readline()
+            #if len(line0) < 10 and not lecFound0:
+            #    lecFound0 = True
+            #if len(line1) < 10 and not lecFound1:
+            #    lecFound1 = True
+            #elif lecFound0 and lecFound1:
+            #    break
+            
         line0 = dwm0.readline()
+        #print(line0)
         line1 = dwm1.readline()
+        #print(line1)
+        #print(len(line1))
+
         # Extract distance from line, case on <10m or >10m (line len 37 or 38)
         if len(line0) == 37 or len(line0) == 38:
             dist0f = float(line0[-6:-2])
@@ -97,9 +130,9 @@ while True:
                 old_ang = getAvg(angles[0:len(angles)//2])
             new_ang = getAvg(angles[len(angles)//2:])
 
-            print("old_ang: ", old_ang)
-            print("new_ang: ", new_ang)
-
+            #print("old_ang: ", old_ang)
+            #print("new_ang: ", new_ang)
+            
             if abs(dist0a - dist1a) < 0.15:
                 lr_bool = 2
             elif dist0a < dist1a:
@@ -111,16 +144,15 @@ while True:
             dist0s = str(int(dist0a*100)) + '\n'
             dist1s = str(int(dist1a*100)) + '\n'
             lr_bool_s = str(lr_bool) + '\n'
-            #'''''
+            ##
             print("uwb0 dist: ", dist0s)
             print("uwb1 dist: ", dist1s)
             print("lr bool: ", lr_bool_s)
-            #'''''
+            ##
             Arduino.write(dist0s.encode('utf-8'))
             Arduino.write(dist1s.encode('utf-8'))
             Arduino.write(lr_bool_s.encode('utf-8'))
            
-            
             try:
                 print("start rec")
                 rec_msg = Arduino.readline().decode('utf-8', 'backslashreplace')
@@ -133,6 +165,8 @@ while True:
     except:
         print("Unspecified Error")
         break
+    #print(time.time() - t)
+
 
 dwm0.write('\r'.encode())
 dwm1.write('\r'.encode())
