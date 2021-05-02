@@ -49,6 +49,7 @@ offset = 0.09
 
 isLeft = True
 
+<<<<<<< HEAD
 # threshold in uwb distance differences, to determine straight bool
 straight_thresh = 0.12
 
@@ -56,6 +57,10 @@ straight_thresh = 0.12
 
 #lecFound0 = False
 #lecFound1 = False
+=======
+# difference threshold in uwb distance for command = straight (lr_bool = 2)
+straightDistLimit = 0.15
+>>>>>>> 9973c9bf24c5bf111a45deb2cad2c93d4ce87409
 
 while True:
     #t = time.time()
