@@ -7,7 +7,9 @@
 Servo myservo1;
 Servo myservo2;
 
-RoboClaw roboclaw(&Serial2,10000);
+SoftwareSerial roboSerial(2,3);
+
+RoboClaw roboclaw(&roboSerial,10000);
 
 #define address 0x80
 
@@ -37,7 +39,7 @@ int timingWindow = 500;
 
 const int buttonPin = 5;
 int buttonState = 0;
-int pressed = false;
+int pressed = true;
 
 unsigned long time0;
 unsigned long time1;
@@ -68,28 +70,13 @@ void setup() {
 
 void loop() {
   buttonState = digitalRead(buttonPin);
-//  Serial.println(pressed);
-  if (buttonState == HIGH){
-    pressed = !pressed;
-    
-    delay(500);
-  }
-//  if (pressed == true){
-//    moveDown();
-//  }
-//  else{
-//    moveUp();
-//  }
 
   if (pressed == true){
     if (Serial.available() > 0) {
-      // uwb0 distance
       String data = Serial.readStringUntil('\n');
       //Serial.println(data);
       uwb0 = data.substring(0, 3).toInt();
-      //data = Serial.readStringUntil('\n');
       uwb1 = data.substring(3, 6).toInt();
-      // heading angle of tag
       leftOrRight = data.substring(6).toInt();
 //      Serial.print("uwb0: ");
 //      Serial.print(uwb0);
