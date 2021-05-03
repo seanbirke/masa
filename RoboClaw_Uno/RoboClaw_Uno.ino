@@ -9,7 +9,10 @@ Servo myservo2;
 
 SoftwareSerial roboSerial(2,3);
 
-RoboClaw roboclaw(&roboSerial,10000);
+//RoboClaw roboclaw(&roboSerial,10000);
+
+RoboClaw roboclaw(&Serial2,10000);
+
 
 #define address 0x80
 
