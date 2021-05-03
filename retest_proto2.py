@@ -3,7 +3,6 @@ import time
 import math
 
 # Connect to uwb modules on specified ports, must be plugged in in order
-<<<<<<< HEAD
 dwm0 = serial.Serial(port='/dev/ttyACM0', baudrate=115200)
 dwm1 = serial.Serial(port='/dev/ttyACM1', baudrate=115200)
 
@@ -18,7 +17,6 @@ dwm1 = serial.Serial(port='/dev/tty.usbmodem0007601193921', baudrate=115200)
 
 print('Connected to ' + dwm0.name + ' and ' + dwm1.name)
 
->>>>>>> 9973c9bf24c5bf111a45deb2cad2c93d4ce87409
 # init uwb modules, start outputign distances
 dwm0.write('\r\r'.encode())
 dwm1.write('\r\r'.encode())
@@ -66,11 +64,9 @@ offset = 0.09
 lr_bool = 2
 
 # difference threshold in uwb distance for command = straight (lr_bool = 2)
-<<<<<<< HEAD
+
 straight_thresh = 0.15
-=======
-straightThres = 0.15
->>>>>>> 9973c9bf24c5bf111a45deb2cad2c93d4ce87409
+
 
 while True:
     try:
@@ -88,27 +84,19 @@ while True:
             dist0_f = float(line0[-7:-2])
         else:
             print(len(line0))
-<<<<<<< HEAD
-        
-=======
-            
->>>>>>> 9973c9bf24c5bf111a45deb2cad2c93d4ce87409
+
         if len(line1) == 37:
             dist1_f = float(line1[-6:-2])
         elif len(line1) == 38:
             dist1_f = float(line1[-7:-2])
         else:
             print(len(line1))
-<<<<<<< HEAD
-        
-=======
 
->>>>>>> 9973c9bf24c5bf111a45deb2cad2c93d4ce87409
         # Added offset for uwb error correction
         dist0_f += offset
         dist1_f += offset
 
-<<<<<<< HEAD
+
         # Add to averaging window, that averages distances over 1s
         if len(window0) < win_size:
             window0.append(dist0_f)
@@ -181,38 +169,6 @@ while True:
                 print(rec_msg)
             except:
                 print("NO REC MSG")
-=======
-        big = max(dist0_f, dist1_f)
-        sm = min(dist1_f, dist1_f)
-
-        # Cosine Rule for calculating heading, uwb placed sideways
-        loc = (c_dist**2 + big**2 - sm**2)/(2*big*c_dist)
-        if loc < -1:
-            loc = -1
-        elif loc > 1:
-            loc = 1
-        angle = 90 - math.degrees(math.acos(loc))
-
-        # lr_bool determines direction of turning
-        if abs(dist0_f - dist1_f) < 0.15:
-            lr_bool = 2
-        elif dist0_f < dist1_f:
-            lr_bool = 0
-        elif dist1_f < dist0_f:
-            lr_bool = 1
-
-        # print("UWB0 dist: ", dist0_f)
-        # print("UWB1 dist: ", dist1_f)
-        # print("L/R Boolean: ", lr_bool)
-
-        dist0_s = str(round(dist0_f*100)) + '\n'
-        dist1_s = str(round(dist1_f*100)) + '\n'
-        lr_bool_s = str(lr_bool) + '\n'
-
-        print("uwb0 dist: ", dist0_s)
-        print("uwb1 dist: ", dist1_s)
-        print("lr bool: ", lr_bool_s)
->>>>>>> 9973c9bf24c5bf111a45deb2cad2c93d4ce87409
 
     except:
         print("Can't read UWB lines")
@@ -222,10 +178,6 @@ dwm0.write('\r'.encode())
 dwm1.write('\r'.encode())
 dwm0.close()
 dwm1.close()
-<<<<<<< HEAD
+
 Arduino.close()
-=======
-
->>>>>>> 9973c9bf24c5bf111a45deb2cad2c93d4ce87409
-
 
