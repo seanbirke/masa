@@ -11,12 +11,6 @@ print('Connected to ' + dwm0.name + ' and ' + dwm1.name)
 # Arduino is defined on ttyACM2 so must be plugged in third
 Arduino = serial.Serial(port='/dev/ttyACM2', baudrate=9600)
 
-=======
-dwm0 = serial.Serial(port='/dev/tty.usbmodem0007601200521', baudrate=115200)
-dwm1 = serial.Serial(port='/dev/tty.usbmodem0007601193921', baudrate=115200)
-
-print('Connected to ' + dwm0.name + ' and ' + dwm1.name)
-
 # init uwb modules, start outputign distances
 dwm0.write('\r\r'.encode())
 dwm1.write('\r\r'.encode())
