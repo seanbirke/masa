@@ -105,7 +105,11 @@ void loop() {
     sideLeftDistIR = sideSensorLeft.distance();
     sideRightDistIR = sideSensorRight.distance();
 
-    if (frontLeftDistIR < 50 || frontRightDistIR < 50){
+    if (uwb0 <100){
+      moveForward(0);
+    }
+    
+    else if (frontLeftDistIR < 50 || frontRightDistIR < 50){
       // Implement case for local minima - getting stuck in a U-Shaped obstacle
 //      if ((frontLeftDistIR < 30 && frontRightDistIR < 30) || (frontLeftDistIR < 15) || (frontRightDistIR < 15)){
 //        moveBackward(32);      
@@ -213,10 +217,10 @@ void turnRight(int motorSpeed) {
 
 void moveUp(){
   myservo1.write(0);
-  myservo2.write(90);
+  myservo2.write(70);
 }
 
 void moveDown(){
-  myservo1.write(90);
+  myservo1.write(70);
   myservo2.write(0);
 }
