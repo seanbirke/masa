@@ -44,6 +44,13 @@ int uwb0 = 0;
 int uwb1 = 0;
 int leftOrRight;
 
+int threshold1Speed = 100; // between 100-300
+int threshold2Speed = 127; // > 300
+
+int turnSpeed1 = 40; // between 100-300
+int turnSpeed2 = 32; // >300
+
+
 //Servo for retraction 
 Servo myservo1; //left
 Servo myservo2; //right
@@ -51,6 +58,8 @@ Servo myservo2; //right
 const int buttonPin = 5;
 int buttonState = 0;
 int pressed = false;
+
+int camAngle = 90;
 
 void setup() {
   //Open Serial and roboclaw serial ports
@@ -105,10 +114,9 @@ void loop() {
     sideLeftDistIR = sideSensorLeft.distance();
     sideRightDistIR = sideSensorRight.distance();
 
-    if (uwb0 <100){
+    if (uwb0 < 100){
       moveForward(0);
     }
-    
     else if (frontLeftDistIR < 50 || frontRightDistIR < 50){
       // Implement case for local minima - getting stuck in a U-Shaped obstacle
 //      if ((frontLeftDistIR < 30 && frontRightDistIR < 30) || (frontLeftDistIR < 15) || (frontRightDistIR < 15)){
@@ -118,24 +126,24 @@ void loop() {
 //        moveBackward(32);      
 //      }
       if (frontLeftDistIR < frontRightDistIR){
-        if (uwb0 > 100 && uwb0 < 300){
-          roboclaw.BackwardM1(address, 64);
-          roboclaw.ForwardM2(address, 64);
+        if (uwb0 >= 100 && uwb0 < 1000){
+          roboclaw.BackwardM1(address, turnSpeed1);
+          roboclaw.ForwardM2(address, turnSpeed1);
         }
-        else if(uwb0 > 300){
-          roboclaw.BackwardM1(address, 32);
-          roboclaw.ForwardM2(address, 32);
-        }
+//        else if(uwb0 > 300){
+//          roboclaw.BackwardM1(address, turnSpeed2);
+//          roboclaw.ForwardM2(address, turnSpeed2);
+//        }
       }
       else{
-        if (uwb0 > 100 && uwb0 < 300){
-          roboclaw.ForwardM1(address, 64);
-          roboclaw.BackwardM2(address, 64);
+        if (uwb0 >= 100 && uwb0 < 1000){
+          roboclaw.ForwardM1(address, turnSpeed1);
+          roboclaw.BackwardM2(address, turnSpeed1);
         }
-        else if(uwb0 > 300){
-          roboclaw.ForwardM1(address, 32);
-          roboclaw.BackwardM2(address, 32);
-        }
+//        else if(uwb0 > 300){
+//          roboclaw.ForwardM1(address, turnSpeed2);
+//          roboclaw.BackwardM2(address, turnSpeed2);
+//        }
       }
     }
 
@@ -154,28 +162,28 @@ void loop() {
 //      rightWall = false;
 //    }
     
-    else if (uwb0 > 300) {
+//    else if (uwb0 >= 300) {
+//      // Move full speed if far away
+//      if (leftOrRight == 0) {
+//        changeSpeed(127,100);
+//      }
+//      else if(leftOrRight == 1){
+//        changeSpeed(100, 127); 
+//      }
+//      else {
+//        moveForward(127);
+//      }
+//    }
+    else if(uwb0 >= 100) {
       // Move full speed if far away
       if (leftOrRight == 0) {
-        changeSpeed(127,100);
+        changeSpeed(threshold1Speed, threshold1Speed-30);
       }
       else if(leftOrRight == 1){
-        changeSpeed(100, 127); 
+        changeSpeed(threshold1Speed-30, threshold1Speed); 
       }
       else {
-        moveForward(127);
-      }
-    }
-    else if(uwb0 > 100 && uwb0 < 300) {
-      // Move full speed if far away
-      if (leftOrRight == 0) {
-        changeSpeed(100, 70);
-      }
-      else if(leftOrRight == 1){
-        changeSpeed(70, 100); 
-      }
-      else {
-        moveForward(100);
+        moveForward(threshold1Speed);
       }
     }
   
@@ -217,10 +225,10 @@ void turnRight(int motorSpeed) {
 
 void moveUp(){
   myservo1.write(0);
-  myservo2.write(70);
+  myservo2.write(0);
 }
 
 void moveDown(){
-  myservo1.write(70);
-  myservo2.write(0);
+  myservo1.write(camAngle);
+  myservo2.write(camAngle );
 }
