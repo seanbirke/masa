@@ -165,13 +165,13 @@ void loop() {
 //    else if (uwb0 >= 300) {
 //      // Move full speed if far away
 //      if (leftOrRight == 0) {
-//        changeSpeed(127,100);
+//        changeSpeed(threshold2Speed,threshold2Speed-27);
 //      }
 //      else if(leftOrRight == 1){
-//        changeSpeed(100, 127); 
+//        changeSpeed(threshold2Speed-27, threshold2Speed); 
 //      }
 //      else {
-//        moveForward(127);
+//        moveForward(threshold2Speed);
 //      }
 //    }
     else if(uwb0 >= 100) {
@@ -230,5 +230,5 @@ void moveUp(){
 
 void moveDown(){
   myservo1.write(camAngle);
-  myservo2.write(camAngle );
+  myservo2.write(camAngle);
 }
