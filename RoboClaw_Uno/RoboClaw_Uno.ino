@@ -7,7 +7,7 @@
 Servo myservo1;
 Servo myservo2;
 
-SoftwareSerial roboSerial(2,3);
+//SoftwareSerial roboSerial(2,3);
 
 //RoboClaw roboclaw(&roboSerial,10000);
 
@@ -42,7 +42,7 @@ int timingWindow = 500;
 
 const int buttonPin = 5;
 int buttonState = 0;
-int pressed = true;
+int pressed = false;
 
 unsigned long time0;
 unsigned long time1;
@@ -73,59 +73,72 @@ void setup() {
 
 void loop() {
   buttonState = digitalRead(buttonPin);
+  if (buttonState == HIGH) {
+    pressed = !pressed;
+    delay(500);
+    
+    if (pressed == true) {
+      moveDown();
+    }
+    else {
+      moveUp();
+    }
+  }
 
-  if (pressed == true){
-    if (Serial.available() > 0) {
-      String data = Serial.readStringUntil('\n');
-      //Serial.println(data);
-      uwb0 = data.substring(0, 3).toInt();
-      uwb1 = data.substring(3, 6).toInt();
-      leftOrRight = data.substring(6).toInt();
+  
+  if (Serial.available() > 0) {
+    String data = Serial.readStringUntil('\n');
+    //Serial.println(data);
+    uwb0 = data.substring(0, 3).toInt();
+    uwb1 = data.substring(3, 6).toInt();
+    leftOrRight = data.substring(6).toInt();
 //      Serial.print("uwb0: ");
 //      Serial.print(uwb0);
 //      Serial.print("uwb1: ");
 //      Serial.print(uwb1);
 //      Serial.print("lr_bool_s: ");
 //      Serial.println(leftOrRight);
-      if (leftOrRight == 0){
-        Serial.println("Moving Left...");
-      }
-      else if (leftOrRight == 1){
-        Serial.println("Moving Right...");
-      }
-      else{
-        Serial.println("Moving Forward...");
-      }
+    if (leftOrRight == 0){
+      Serial.println("Moving Left...");
     }
-  
+    else if (leftOrRight == 1){
+      Serial.println("Moving Right...");
+    }
+    else{
+      Serial.println("Moving Forward...");
+    }
+  }
+
+  if (pressed == true){
+    
     frontIRdistance1 = frontSensor1.distance();
     frontIRdistance2 = frontSensor2.distance();
   //  Serial.print("1:");
   //  Serial.print(frontIRdistance1);
   //  Serial.print(" 2:");
   //  Serial.println(frontIRdistance2);
-  
-    if (frontIRdistance1 < 50 || frontIRdistance2 < 50){
-      // Implement case for local minima - getting stuck in a U-Shaped obstacle
-      if ((frontIRdistance1 < 30 && frontIRdistance2 < 30) || (frontIRdistance1 < 15) || (frontIRdistance2 < 15)){
-        moveBackward(32);      
-      }
-      else if (frontIRdistance1 < frontIRdistance2){
-        roboclaw.BackwardM1(address, 32);
-        roboclaw.ForwardM2(address, 32);
-      }
-      else{
-        roboclaw.ForwardM1(address, 32);
-        roboclaw.BackwardM2(address, 32);
-      }
-    }
-    else if(uwb0 > 150) {
+//  
+//    if (frontIRdistance1 < 50 || frontIRdistance2 < 50){
+//      // Implement case for local minima - getting stuck in a U-Shaped obstacle
+//      if ((frontIRdistance1 < 30 && frontIRdistance2 < 30) || (frontIRdistance1 < 15) || (frontIRdistance2 < 15)){
+//        moveBackward(32);      
+//      }
+//      else if (frontIRdistance1 < frontIRdistance2){
+//        roboclaw.BackwardM1(address, 32);
+//        roboclaw.ForwardM2(address, 32);
+//      }
+//      else{
+//        roboclaw.ForwardM1(address, 32);
+//        roboclaw.BackwardM2(address, 32);
+//      }
+//    }
+    if (uwb0 > 150) {
       // Move full speed if far away
       if (leftOrRight == 0) {
-        changeSpeed(32, 64);
+        changeSpeed(64,32);
       }
       else if(leftOrRight == 1){
-        changeSpeed(64,32); 
+        changeSpeed(32,64); 
       }
       else {
         moveForward(64);
@@ -153,12 +166,12 @@ void loop() {
   }
 }
 
-void moveForward(int motorSpeed){
+void moveBackward(int motorSpeed){
   roboclaw.ForwardM1(address,motorSpeed);
   roboclaw.ForwardM2(address,motorSpeed);
 }
 
-void moveBackward(int motorSpeed){
+void moveForward(int motorSpeed){
   roboclaw.BackwardM1(address,motorSpeed);
   roboclaw.BackwardM2(address,motorSpeed);
 }
@@ -166,18 +179,18 @@ void moveBackward(int motorSpeed){
 void changeSpeed(int motorSpeed1, int motorSpeed2){
 // Motor 1 = Left motor
 // Motor 2 = Right motor
-  roboclaw.ForwardM1(address,motorSpeed1);
-  roboclaw.ForwardM2(address,motorSpeed2);
+  roboclaw.BackwardM1(address,motorSpeed1);
+  roboclaw.BackwardM2(address,motorSpeed2);
 }
 
 void moveUp(){
-  myservo1.write(60);
-  myservo2.write(0);
+  myservo1.write(0);
+  myservo2.write(90);
 }
 
 void moveDown(){
-  myservo1.write(0);
-  myservo2.write(60);
+  myservo1.write(90);
+  myservo2.write(0);
 }
 
 void displayspeed(void)
