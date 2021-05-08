@@ -58,13 +58,20 @@ lr_bool = 2
 # difference threshold in uwb distance for command = straight
 straight_thresh = 0.125
 
+line_lens = []
+lens_size = 5
+
 
 while True:
     try:
         # Read uwb distances as byte encoded lines
         line0 = dwm0.readline()
         line1 = dwm1.readline()
-        
+
+        line_lens.append(len(line0))
+        if len(line_lens) > lens_size:
+            line_lens.pop(0)
+
         print("line0: ",end='')
         print(line0)
         print("line1: ",end='')
@@ -116,7 +123,9 @@ while True:
             print(angle)
 
             # lr_bool determines direction of turning
-            if abs(dist0_a - dist1_a) < straight_thresh:
+            if getAvg(line_lens) == 0:
+                lr_bool = 3
+            elif abs(dist0_a - dist1_a) < straight_thresh:
                 lr_bool = 2
             elif dist0_a < dist1_a:
                 lr_bool = 0
@@ -156,6 +165,7 @@ while True:
                 print("Error receiving from Arduino")
             '''''
     except:
+        # Sends distances below threshold to stop motors before shutdown
         msg_to_arduino = "0100102" + '\n'
         Arduino.write(msg_to_arduino.encode())
         print("Stopping MASA")
