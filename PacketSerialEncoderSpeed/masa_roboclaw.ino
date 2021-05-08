@@ -75,6 +75,7 @@ void setup() {
 void loop() {
   // Read Button, for mode Manual or Autonomous
   buttonState = digitalRead(buttonPin);
+//  Serial.println(buttonState);
   if (buttonState == HIGH) {
     pressed = !pressed;
     delay(500);
@@ -114,6 +115,7 @@ void loop() {
     sideLeftDistIR = sideSensorLeft.distance();
     sideRightDistIR = sideSensorRight.distance();
 
+    uwb0 = 200;
     if (uwb0 < 100){
       moveForward(0);
     }
@@ -232,3 +234,29 @@ void moveDown(){
   myservo1.write(camAngle);
   myservo2.write(camAngle);
 }
+
+//void greenLight(){
+//  for (int i = 7; i >= 0; i--) {
+//    leds[i] = CRGB (0, 255, 0);
+//    FastLED.show();
+//  }
+//}
+//
+//void yellowLight(){
+//  for (int i = 7; i >= 0; i--) {
+//    leds[i] = CRGB (255, 255, 0);
+//    FastLED.show();
+//  }
+//}
+//
+//void rightTurn(){
+//  for (int i = 7; i >= 0; i--) {
+//    leds[i] = CRGB ( 255, 0, 0);
+//    FastLED.show();
+//    delay(100);
+//  }
+//  for (int i = 0; i <= 7; i++) {
+//    leds[i] = CRGB ( 0, 0, 0);
+//    FastLED.show();
+//  }
+//}
