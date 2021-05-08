@@ -43,13 +43,7 @@ int rightWall = false;
 int uwb0 = 0;
 int uwb1 = 0;
 int leftOrRight;
-
-int threshold1Speed = 100; // between 100-300
-int threshold2Speed = 127; // > 300
-
-int turnSpeed1 = 40; // between 100-300
-int turnSpeed2 = 32; // >300
-
+int user = 0;
 
 //Servo for retraction 
 Servo myservo1; //left
@@ -58,10 +52,6 @@ Servo myservo2; //right
 const int buttonPin = 5;
 int buttonState = 0;
 int pressed = false;
-int isUWBreset = false;
-
-
-int camAngle = 90;
 
 void setup() {
   //Open Serial and roboclaw serial ports
@@ -75,12 +65,26 @@ void setup() {
 }
 
 void loop() {
+  // Read Button, for mode Manual or Autonomous
+  buttonState = digitalRead(buttonPin);
+  if (buttonState == HIGH) {
+    pressed = !pressed;
+    delay(500);
+  }
+  if (pressed == true) {
+      moveDown();
+    }
+  else {
+    moveUp();
+  }
 
+  
   if (Serial.available() > 0) {
     String data = Serial.readStringUntil('\n');
     uwb0 = data.substring(0, 3).toInt();
     uwb1 = data.substring(3, 6).toInt();
     leftOrRight = data.substring(6).toInt();
+    user = (uwb0 + uwb1)/2;
 //    if (leftOrRight == 0){
 //      Serial.print("Moving Left...");
 //    }
@@ -94,33 +98,6 @@ void loop() {
 //    Serial.print(uwb0);
 //    Serial.println(" cm");
   }
-  
-    // Read Button, for mode Manual or Autonomous
-//  buttonState = digitalRead(buttonPin);
-//  if (buttonState == HIGH) {
-//    pressed = !pressed;
-//    delay(500);
-//  }
-//  if (pressed == true) {
-//      moveDown();
-//    }
-//  else {
-//    moveUp();
-//  }
-
-  if (!isUWBreset && leftOrRight == 3) {
-    pressed = !pressed;
-    isUWBreset = true;
-    if (pressed == true) {
-      moveDown();
-    }
-    else {
-      moveUp();
-    }
-  }
-  else {
-    isUWBreset = false;
-  }
 
   if (pressed == true){
     
@@ -129,10 +106,10 @@ void loop() {
     sideLeftDistIR = sideSensorLeft.distance();
     sideRightDistIR = sideSensorRight.distance();
 
-    uwb0 = 200;
-    if (uwb0 < 100){
+    if (user < 100){
       moveForward(0);
     }
+    
     else if (frontLeftDistIR < 50 || frontRightDistIR < 50){
       // Implement case for local minima - getting stuck in a U-Shaped obstacle
 //      if ((frontLeftDistIR < 30 && frontRightDistIR < 30) || (frontLeftDistIR < 15) || (frontRightDistIR < 15)){
@@ -142,24 +119,24 @@ void loop() {
 //        moveBackward(32);      
 //      }
       if (frontLeftDistIR < frontRightDistIR){
-        if (uwb0 >= 100 && uwb0 < 1000){
-          roboclaw.BackwardM1(address, turnSpeed1);
-          roboclaw.ForwardM2(address, turnSpeed1);
+        if (user > 100 && user < 300){
+          roboclaw.BackwardM1(address, 32);
+          roboclaw.ForwardM2(address, 32);
         }
-//        else if(uwb0 > 300){
-//          roboclaw.BackwardM1(address, turnSpeed2);
-//          roboclaw.ForwardM2(address, turnSpeed2);
-//        }
+        else if(user > 300){
+          roboclaw.BackwardM1(address, 64);
+          roboclaw.ForwardM2(address, 64);
+        }
       }
       else{
-        if (uwb0 >= 100 && uwb0 < 1000){
-          roboclaw.ForwardM1(address, turnSpeed1);
-          roboclaw.BackwardM2(address, turnSpeed1);
+        if (user > 100 && user < 300){
+          roboclaw.ForwardM1(address, 32);
+          roboclaw.BackwardM2(address, 32);
         }
-//        else if(uwb0 > 300){
-//          roboclaw.ForwardM1(address, turnSpeed2);
-//          roboclaw.BackwardM2(address, turnSpeed2);
-//        }
+        else if(user > 300){
+          roboclaw.ForwardM1(address, 64);
+          roboclaw.BackwardM2(address, 64);
+        }
       }
     }
 
@@ -178,28 +155,28 @@ void loop() {
 //      rightWall = false;
 //    }
     
-//    else if (uwb0 >= 300) {
-//      // Move full speed if far away
-//      if (leftOrRight == 0) {
-//        changeSpeed(threshold2Speed,threshold2Speed-27);
-//      }
-//      else if(leftOrRight == 1){
-//        changeSpeed(threshold2Speed-27, threshold2Speed); 
-//      }
-//      else {
-//        moveForward(threshold2Speed);
-//      }
-//    }
-    else if(uwb0 >= 100) {
+    else if (user > 300) {
       // Move full speed if far away
       if (leftOrRight == 0) {
-        changeSpeed(threshold1Speed, threshold1Speed-30);
+        changeSpeed(127,100);
       }
       else if(leftOrRight == 1){
-        changeSpeed(threshold1Speed-30, threshold1Speed); 
+        changeSpeed(100, 127); 
       }
       else {
-        moveForward(threshold1Speed);
+        moveForward(127);
+      }
+    }
+    else if(user > 100 && user < 300) {
+      // Move full speed if far away
+      if (leftOrRight == 0) {
+        changeSpeed(100, 70);
+      }
+      else if(leftOrRight == 1){
+        changeSpeed(70, 100); 
+      }
+      else {
+        moveForward(100);
       }
     }
   
@@ -241,36 +218,10 @@ void turnRight(int motorSpeed) {
 
 void moveUp(){
   myservo1.write(0);
-  myservo2.write(0);
+  myservo2.write(70);
 }
 
 void moveDown(){
-  myservo1.write(camAngle);
-  myservo2.write(camAngle);
+  myservo1.write(70);
+  myservo2.write(0);
 }
-
-//void greenLight(){
-//  for (int i = 7; i >= 0; i--) {
-//    leds[i] = CRGB (0, 255, 0);
-//    FastLED.show();
-//  }
-//}
-//
-//void yellowLight(){
-//  for (int i = 7; i >= 0; i--) {
-//    leds[i] = CRGB (255, 255, 0);
-//    FastLED.show();
-//  }
-//}
-//
-//void rightTurn(){
-//  for (int i = 7; i >= 0; i--) {
-//    leds[i] = CRGB ( 255, 0, 0);
-//    FastLED.show();
-//    delay(100);
-//  }
-//  for (int i = 0; i <= 7; i++) {
-//    leds[i] = CRGB ( 0, 0, 0);
-//    FastLED.show();
-//  }
-//}
